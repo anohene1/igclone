@@ -12,4 +12,15 @@ export default NextAuth({
     signIn: '/auth/signin',
   },
   secret: process.env.JWT_SECRET,
+  callbacks: {
+    async session({ session, token, user }) {
+      session.user.username = session.user.name
+        .split(' ')
+        .join('')
+        .toLowerCase()
+      session.user.uid = token.sub
+
+      return session
+    },
+  },
 })

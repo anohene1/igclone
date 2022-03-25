@@ -1,9 +1,13 @@
 import { getProviders, signIn } from 'next-auth/react'
 import Header from '../../components/Header'
+import Head from 'next/head'
 
 function SignIn({ providers }) {
   return (
     <>
+      <Head>
+        <title>Sign In</title>
+      </Head>
       <Header />
 
       <div

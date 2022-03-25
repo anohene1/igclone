@@ -9,9 +9,13 @@ import {
 } from '@heroicons/react/outline'
 import { HomeIcon } from '@heroicons/react/solid'
 import { signIn, useSession, signOut } from 'next-auth/react'
+import Link from 'next/link'
+import { useRecoilState } from 'recoil'
+import { modalState } from '../atoms/modalAtom'
 
 function Header(props) {
   const { data: session } = useSession()
+  const [modalOpen, setModalOpen] = useRecoilState(modalState)
 
   return (
     <div className="shadow-sm border-b bg-white sticky top-0 z-50">
@@ -45,10 +49,12 @@ function Header(props) {
         </div>
 
         <div className="flex items-center justify-end space-x-4">
+          <Link href="/">
+            <HomeIcon className="navBtn" />
+          </Link>
           {session ? (
             <>
               {' '}
-              <HomeIcon className="navBtn" />
               <MenuIcon className="h-6 md:hidden cursor-pointer" />
               <div className="relative navBtn">
                 <PaperAirplaneIcon className="navBtn rotate-45" />
@@ -56,7 +62,10 @@ function Header(props) {
                   3
                 </div>
               </div>
-              <PlusCircleIcon className="navBtn" />
+              <PlusCircleIcon
+                onClick={() => setModalOpen(true)}
+                className="navBtn"
+              />
               <UserGroupIcon className="navBtn" />
               <HeartIcon className="navBtn" />
               <img
