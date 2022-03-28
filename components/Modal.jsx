@@ -3,11 +3,52 @@ import { modalState } from '../atoms/modalAtom'
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useRef, useState } from 'react'
 import { CameraIcon } from '@heroicons/react/outline'
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+  updateDoc,
+  doc,
+} from 'firebase/firestore'
+import { ref, getDownloadURL, uploadString } from 'firebase/storage'
+import { db, storage } from '../firebase'
+import { useSession } from 'next-auth/react'
 
 function Modal(props) {
   const [modalOpen, setModalOpen] = useRecoilState(modalState)
+  const { data: session } = useSession()
   const filePickerRef = useRef(null)
+  const captionRef = useRef(null)
+  const [loading, setLoading] = useState(false)
   const [selectedFile, setSelectedFile] = useState(null)
+
+  async function uploadPost() {
+    if (loading) return
+
+    setLoading(true)
+
+    const docRef = await addDoc(collection(db, 'posts'), {
+      username: session.user.username,
+      caption: captionRef.current.value,
+      profileImg: session.user.image,
+      timestamp: serverTimestamp(),
+    })
+
+    const imageRef = ref(storage, `posts/${docRef.id}/image`)
+
+    await uploadString(imageRef, selectedFile, 'data_url').then(
+      async (snapshot) => {
+        const downloadUrl = await getDownloadURL(imageRef)
+        await updateDoc(doc(db, 'posts', docRef.id), {
+          image: downloadUrl,
+        })
+      }
+    )
+
+    setLoading(false)
+    setModalOpen(false)
+    setSelectedFile(null)
+  }
 
   function addImageToPost(event) {
     const reader = new FileReader()
@@ -106,6 +147,7 @@ function Modal(props) {
                     <div className="mt-2">
                       <input
                         type="text"
+                        ref={captionRef}
                         className="border-none focus:ring-0 w-full text-center"
                         placeholder="Please enter a caption..."
                       />
@@ -115,13 +157,15 @@ function Modal(props) {
 
                 <div className="mt-5 sm:mt-6">
                   <button
+                    onClick={uploadPost}
+                    disabled={!selectedFile || loading}
                     type="button"
                     className="inline-flex justify-center w-full
                   rounded-md border border-transparent shadow-sm px-4
                   py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700
                   focus:outline-none focus:ring-2 disabled:cursor-not-allowed hover:disabled:bg-gray-300"
                   >
-                    Upload Post
+                    {loading ? 'Uploading...' : 'Upload Post'}
                   </button>
                 </div>
               </div>
