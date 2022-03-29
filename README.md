@@ -7,7 +7,7 @@ This is an instagram clone built while learning NextJS
 - Is responsive
 - Has Post, Like and Comment functionalities
 
-You can see the hosted version <a>here</a>
+You can see the hosted version <a href="https://igclone-614.vercel.app/">here</a>
 
 ## Screenshots
 Don't mind the 'cloudstorage' usernames. Those are just my Google accounts I use for storage only. 
