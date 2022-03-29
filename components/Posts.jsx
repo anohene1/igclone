@@ -31,6 +31,7 @@ function Posts(props) {
         query(collection(db, 'posts'), orderBy('timestamp', 'desc')),
         (snapshot) => {
           setPosts(snapshot.docs)
+          console.log(snapshot.docs[0].data())
         }
       )
     },
@@ -44,8 +45,8 @@ function Posts(props) {
           key={post.id}
           id={post.id}
           username={post.data().username}
-          userImg={post.data().userImg}
-          img={post.data().img}
+          userImg={post.data().profileImg}
+          img={post.data().image}
           caption={post.data().caption}
         />
       ))}
